@@ -6,10 +6,24 @@ import * as files from "./helpers/files"
 import * as line from "./helpers/line"
 import * as links from "./helpers/links"
 
-export async function filesRenamed(renamedEvent: vscode.FileRenameEvent): Promise<void> {
-  // flush all open changes to the filesystem since we are reading files below
-  await vscode.workspace.saveAll(false)
+export function createCallback(tikibaseEnabled: boolean, runTikibase: () => Promise<void>) {
+  return filesRenamed.bind(null, tikibaseEnabled, runTikibase)
+}
 
+async function filesRenamed(
+  tikibaseEnabled: boolean,
+  runTikibase: () => Promise<void>,
+  renamedEvent: vscode.FileRenameEvent
+): Promise<void> {
+  // flush all open changes to the filesystem since we are about to read from it
+  await vscode.workspace.saveAll(false)
+  await updateLinks(renamedEvent)
+  if (tikibaseEnabled) {
+    await runTikibase()
+  }
+}
+
+async function updateLinks(renamedEvent: vscode.FileRenameEvent) {
   const wsRoot = configuration.workspacePath()
   if (!wsRoot) {
     return

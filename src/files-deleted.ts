@@ -6,10 +6,24 @@ import * as files from "./helpers/files"
 import * as line from "./helpers/line"
 import * as links from "./helpers/links"
 
-export async function filesDeleted(deletedEvent: vscode.FileDeleteEvent): Promise<void> {
+export function createCallback(tikibaseEnabled: boolean, runTikibase: () => Promise<void>) {
+  return filesDeleted.bind(null, tikibaseEnabled, runTikibase)
+}
+
+async function filesDeleted(
+  tikibaseEnabled: boolean,
+  runTikibase: () => Promise<void>,
+  deletedEvent: vscode.FileDeleteEvent
+): Promise<void> {
   // flush all open changes to the filesystem since we are reading files below
   await vscode.workspace.saveAll(false)
+  await updateLinks(deletedEvent)
+  if (tikibaseEnabled) {
+    await runTikibase()
+  }
+}
 
+async function updateLinks(deletedEvent: vscode.FileDeleteEvent) {
   const wsRoot = configuration.workspacePath()
   if (!wsRoot) {
     return
