@@ -18,6 +18,8 @@ async function filesDeleted(
   // flush all open changes to the filesystem since we are reading files below
   await vscode.workspace.saveAll(false)
   await updateLinks(deletedEvent)
+  // flush the changes we just made
+  await vscode.workspace.saveAll(false)
   if (tikibaseEnabled) {
     await runTikibase()
   }
