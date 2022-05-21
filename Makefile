@@ -1,10 +1,14 @@
-.DEFAULT_GOAL := help
+build: compile  # builds the extension in production mode
+	${CURDIR}/node_modules/.bin/esbuild ./src/extension.ts --bundle --outfile=dist/main.js --external:vscode --format=cjs --platform=node --minify
 
-build: clean  # compiles the extension
+build-dev: compile  # builds the extension in dev mode
+	${CURDIR}/node_modules/.bin/esbuild ./src/extension.ts --bundle --outfile=dist/main.js --external:vscode --format=cjs --platform=node --sourcemap
+
+compile: clean  # compiles the extension
 	${CURDIR}/node_modules/.bin/tsc -p .
 
 clean:  # removes all build artifacts
-	rm -rf out
+	rm -rf out dist
 
 doc:  # runs the documentation tests
 	${CURDIR}/node_modules/.bin/text-run --format=dot
@@ -25,7 +29,7 @@ lint:  # runs all linters
 list-shipped-files:  # lists all the files that will get shipped in the compiled extension, edit .vscodeignore to change
 	vsce ls
 
-package:  # package the extension for local installation
+package: build  # package the extension for local installation
 	vsce package
 
 publish-patch:  # publishes a new patch version
@@ -56,4 +60,6 @@ unit: build  # runs the unit tests
 update:  # updates all dependencies
 	yarn upgrade --latest
 
+
+.DEFAULT_GOAL := help
 .SILENT:

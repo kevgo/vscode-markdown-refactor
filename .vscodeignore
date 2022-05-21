@@ -9,8 +9,7 @@ examples/
 !LICENSE.txt
 **/*.map
 node_modules/
-out/**/*.test.js
-out/test/*
+out/
 scripts/
 src/
 text-run/

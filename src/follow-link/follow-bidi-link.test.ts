@@ -10,7 +10,7 @@ import {
   splitAnchor
 } from "./follow-bidi-link"
 
-suite("followBiDiLink", function() {
+suite("follow-bidi-link", function() {
   test("extractLinkTarget", function() {
     const give = "one [title1](target1.md) two [title2](target2.md) three"
     const link2start = 29
@@ -51,7 +51,7 @@ suite("followBiDiLink", function() {
     }
   })
 
-  suite("isHeadingMatchingAnchor", function() {
+  suite("isHeadingMatchingTarget", function() {
     const tests = {
       "# heading 2": true,
       "### heading 2": true,
